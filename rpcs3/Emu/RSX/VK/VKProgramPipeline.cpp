@@ -602,13 +602,14 @@ namespace vk
 			}
 
 			m_descriptor_set = allocate_descriptor_set();
-
+#ifndef __APPLE__
 			if (!m_descriptor_template.empty()) [[ likely ]]
 			{
 				// Run pointer updates. Optimized for cached back-to-back updates which are quite frequent.
 				update_descriptor_template();
 			}
 			else
+#endif
 			{
 				// Creating the template also seeds initial values
 				create_descriptor_template();

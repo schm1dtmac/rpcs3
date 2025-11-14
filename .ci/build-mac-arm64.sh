@@ -6,7 +6,8 @@ export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-brew install -f --overwrite --quiet ccache fmt pipenv googletest ffmpeg@5 "llvm@$LLVM_COMPILER_VER" glew sdl3 vulkan-headers
+brew update
+brew install -f --overwrite --quiet ccache pipenv googletest ffmpeg@5 "llvm@$LLVM_COMPILER_VER" glew sdl3 vulkan-headers
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER" ffmpeg@5
 
 # moltenvk based on commit for 1.3.0 release

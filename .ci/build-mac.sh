@@ -6,7 +6,7 @@ export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-brew install -f --overwrite --quiet ccache pipenv "llvm@$LLVM_COMPILER_VER"
+brew install -f --overwrite --quiet pipenv "llvm@$LLVM_COMPILER_VER"
 brew link -f --overwrite --quiet "llvm@$LLVM_COMPILER_VER"
 # shellcheck disable=SC3009
 rm /usr/local/bin/{idle3.14,pip3.14,pydoc3.14,python3.14,python3.14-config} && \

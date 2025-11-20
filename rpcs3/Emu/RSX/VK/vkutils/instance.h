@@ -6,11 +6,6 @@
 #include <algorithm>
 #include <vector>
 
-#ifdef __APPLE__
-#include <MoltenVK/mvk_vulkan.h>
-#include <MoltenVK/mvk_private_api.h>
-#endif
-
 namespace vk
 {
 	class supported_extensions

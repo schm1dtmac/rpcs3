@@ -6,14 +6,11 @@ export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-/opt/homebrew/bin/brew install -f --overwrite --quiet nasm ninja p7zip ccache pipenv gnutls freetype googletest #create-dmg
+/opt/homebrew/bin/brew install -f --overwrite --quiet nasm ninja p7zip pipenv gnutls freetype googletest #create-dmg
 /opt/homebrew/bin/brew install -f --quiet ffmpeg@5
-/opt/homebrew/bin/brew install --quiet "llvm@$LLVM_COMPILER_VER" glew cmake sdl3 vulkan-headers coreutils
+/opt/homebrew/bin/brew install --quiet "llvm@$LLVM_COMPILER_VER" glew cmake sdl3 vulkan-headers coreutils vulkan-loader
 /opt/homebrew/bin/brew link -f --quiet "llvm@$LLVM_COMPILER_VER" ffmpeg@5
 
-# moltenvk based on commit for 1.3.0 release
-wget https://raw.githubusercontent.com/Homebrew/homebrew-core/7255441cbcafabaa8950f67c7ec55ff499dbb2d3/Formula/m/molten-vk.rb
-/opt/homebrew/bin/brew install -f --overwrite --formula --quiet ./molten-vk.rb
 export CXX=clang++
 export CC=clang
 
@@ -59,9 +56,7 @@ export LIBRARY_PATH="$BREW_PATH/lib"
 export LD_LIBRARY_PATH="$BREW_PATH/lib"
 
 export VULKAN_SDK
-VULKAN_SDK="$BREW_PATH/opt/molten-vk"
-ln -s "$VULKAN_SDK/lib/libMoltenVK.dylib" "$VULKAN_SDK/lib/libvulkan.dylib" || true
-export VK_ICD_FILENAMES="$VULKAN_SDK/share/vulkan/icd.d/MoltenVK_icd.json"
+VULKAN_SDK="$BREW_PATH/opt/vulkan-loader"
 
 export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"

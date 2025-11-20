@@ -103,15 +103,6 @@ namespace vk
 		std::vector<const char*> layers;
 		const void* next_info = nullptr;
 
-#ifdef __APPLE__
-		// Declare MVK variables here to ensure the lifetime within the entire scope
-		const VkBool32 setting_true = VK_TRUE;
-		const int32_t setting_fast_math = g_cfg.video.disable_msl_fast_math.get() ? MVK_CONFIG_FAST_MATH_NEVER : MVK_CONFIG_FAST_MATH_ON_DEMAND;
-
-		std::vector<VkLayerSettingEXT> mvk_settings;
-		VkLayerSettingsCreateInfoEXT mvk_layer_settings_create_info{};
-#endif
-
 		if (!fast)
 		{
 			extensions_loaded = true;
@@ -122,24 +113,6 @@ namespace vk
 			{
 				extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 			}
-
-#ifdef __APPLE__
-			if (support.is_supported(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME))
-			{
-				extensions.push_back(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);
-				layers.push_back(kMVKMoltenVKDriverLayerName);
-
-				mvk_settings.push_back(VkLayerSettingEXT{ kMVKMoltenVKDriverLayerName, "MVK_CONFIG_RESUME_LOST_DEVICE", VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &setting_true });
-				mvk_settings.push_back(VkLayerSettingEXT{ kMVKMoltenVKDriverLayerName, "MVK_CONFIG_FAST_MATH_ENABLED", VK_LAYER_SETTING_TYPE_INT32_EXT, 1, &setting_fast_math });
-
-				mvk_layer_settings_create_info.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT;
-				mvk_layer_settings_create_info.pNext = next_info;
-				mvk_layer_settings_create_info.settingCount = static_cast<uint32_t>(mvk_settings.size());
-				mvk_layer_settings_create_info.pSettings = mvk_settings.data();
-
-				next_info = &mvk_layer_settings_create_info;
-			}
-#endif
 
 			if (support.is_supported(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME))
 			{
@@ -154,7 +127,7 @@ namespace vk
 #ifdef _WIN32
 			extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(__APPLE__)
-			extensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
+			extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
 #else
 			bool found_surface_ext = false;
 #ifdef HAVE_X11

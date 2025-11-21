@@ -9,6 +9,12 @@ export HOMEBREW_NO_INSTALL_CLEANUP=1
 brew install -f --overwrite --quiet pipenv googletest ffmpeg@5 "llvm@$LLVM_COMPILER_VER" glew sdl3 vulkan-headers vulkan-loader
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER" ffmpeg@5
 
+# moltenvk based on commit for 1.4.0 release
+export HOMEBREW_DEVELOPER=1 # Prevents blocking of local formulae
+wget https://raw.githubusercontent.com/Homebrew/homebrew-core/ea2bec5f1f4384e188d7fc0702ab21a20a2ced08/Formula/m/molten-vk.rb
+/opt/homebrew/bin/brew install -f --overwrite --formula --quiet ./molten-vk.rb
+export HOMEBREW_DEVELOPER=0
+
 export CXX=clang++
 export CC=clang
 
@@ -59,7 +65,8 @@ export LIBRARY_PATH="$BREW_PATH/lib"
 export LD_LIBRARY_PATH="$BREW_PATH/lib"
 
 export VULKAN_SDK
-VULKAN_SDK="$BREW_PATH/opt/vulkan-loader"
+VULKAN_SDK="$BREW_PATH/opt/molten-vk"
+ln -s "$BREW_PATH/opt/vulkan-loader/lib/libvulkan.dylib" "$VULKAN_SDK/lib/libvulkan.dylib" || true
 
 export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"

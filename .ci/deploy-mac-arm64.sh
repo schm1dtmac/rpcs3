@@ -16,8 +16,8 @@ echo "AVVER=$AVVER" >> ../.ci/ci-vars.env
 cd bin
 mkdir "rpcs3.app/Contents/lib/" || true
 mkdir -p "rpcs3.app/Contents/Resources/vulkan/icd.d" || true
-cp -R "$BREW_PATH/opt/molten-vk/lib/libMoltenVK.dylib" "rpcs3.app/Contents/Resources/vulkan/icd.d"
-cp -R "$BREW_PATH/opt/molten-vk/share/vulkan/icd.d/MoltenVK_icd.json" "rpcs3.app/Contents/Resources/vulkan/icd.d"
+cp -R "$BREW_PATH/lib/libMoltenVK.dylib" "rpcs3.app/Contents/Resources/vulkan/icd.d"
+cp -R "$BREW_PATH/share/vulkan/icd.d/MoltenVK_icd.json" "rpcs3.app/Contents/Resources/vulkan/icd.d"
 sed -i '' "s/..\/..\/..\/lib\/libMoltenVK.dylib/.\/libMoltenVK.dylib/g" "rpcs3.app/Contents/Resources/vulkan/icd.d/MoltenVK_icd.json"
 
 cp "$(realpath /opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/lib/c++/libc++abi.1.0.dylib)" "rpcs3.app/Contents/Frameworks/libc++abi.1.dylib"

@@ -155,6 +155,7 @@ namespace vk
 			extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(__APPLE__)
 			extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
+			extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 #else
 			bool found_surface_ext = false;
 #ifdef HAVE_X11
@@ -196,6 +197,9 @@ namespace vk
 		instance_info.enabledExtensionCount = fast ? 0 : static_cast<u32>(extensions.size());
 		instance_info.ppEnabledExtensionNames = fast ? nullptr : extensions.data();
 		instance_info.pNext = next_info;
+#ifdef __APPLE__
+		instance_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
 
 		if (VkResult result = vkCreateInstance(&instance_info, nullptr, &m_instance); result != VK_SUCCESS)
 		{

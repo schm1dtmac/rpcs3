@@ -156,6 +156,7 @@ namespace vk
 #elif defined(__APPLE__)
 			extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
 			extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+			extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 #else
 			bool found_surface_ext = false;
 #ifdef HAVE_X11

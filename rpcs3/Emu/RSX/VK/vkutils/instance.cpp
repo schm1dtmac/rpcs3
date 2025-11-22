@@ -124,10 +124,11 @@ namespace vk
 			}
 
 #ifdef __APPLE__
+			extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+			extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 			if (support.is_supported(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME))
 			{
 				extensions.push_back(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);
-				layers.push_back(kMVKMoltenVKDriverLayerName);
 
 				mvk_settings.push_back(VkLayerSettingEXT{ kMVKMoltenVKDriverLayerName, "MVK_CONFIG_RESUME_LOST_DEVICE", VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &setting_true });
 				mvk_settings.push_back(VkLayerSettingEXT{ kMVKMoltenVKDriverLayerName, "MVK_CONFIG_FAST_MATH_ENABLED", VK_LAYER_SETTING_TYPE_INT32_EXT, 1, &setting_fast_math });
@@ -155,8 +156,6 @@ namespace vk
 			extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(__APPLE__)
 			extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
-			extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-			extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 #else
 			bool found_surface_ext = false;
 #ifdef HAVE_X11

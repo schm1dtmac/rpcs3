@@ -127,7 +127,6 @@ namespace vk
 			if (support.is_supported(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME))
 			{
 				extensions.push_back(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);
-				layers.push_back(kMVKMoltenVKDriverLayerName);
 
 				mvk_settings.push_back(VkLayerSettingEXT{ kMVKMoltenVKDriverLayerName, "MVK_CONFIG_RESUME_LOST_DEVICE", VK_LAYER_SETTING_TYPE_BOOL32_EXT, 1, &setting_true });
 				mvk_settings.push_back(VkLayerSettingEXT{ kMVKMoltenVKDriverLayerName, "MVK_CONFIG_FAST_MATH_ENABLED", VK_LAYER_SETTING_TYPE_INT32_EXT, 1, &setting_fast_math });

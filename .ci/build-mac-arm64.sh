@@ -41,7 +41,7 @@ tar -xvf LLVM-19.1.7-macOS-ARM64.tar.xz
 export LLVM_DIR="$WORKDIR/LLVM-19.1.7-macOS-ARM64"
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export PATH="$LLVM_DIR/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$PATH"
-export LDFLAGS="$LLVM_DIR/lib/libc++.1.dylib $LLVM_DIR/lib/unwind/libunwind.1.dylib"
+export LDFLAGS="-L$LLVM_DIR/lib/"
 
 export VULKAN_SDK
 VULKAN_SDK="$WORKDIR/VulkanSDK/macOS"

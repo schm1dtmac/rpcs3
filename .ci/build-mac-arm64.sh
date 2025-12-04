@@ -42,6 +42,8 @@ export LLVM_DIR="$WORKDIR/LLVM-19.1.7-macOS-ARM64"
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export PATH="$LLVM_DIR/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$PATH"
 export LDFLAGS="-L$LLVM_DIR/lib/"
+export LIBRARY_PATH="$BREW_PATH/lib$LIBRARY_PATH"
+export LD_LIBRARY_PATH="$BREW_PATH/lib:$LIBRARY_PATH"
 
 export VULKAN_SDK
 VULKAN_SDK="$WORKDIR/VulkanSDK/macOS"

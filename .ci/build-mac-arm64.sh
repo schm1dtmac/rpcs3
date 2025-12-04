@@ -29,11 +29,11 @@ fi
 cd "$WORKDIR"
 ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
 
-curl -O https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
+wget https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
 unzip vulkan_sdk.zip
 sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root $WORKDIR/VulkanSDK --accept-licenses --default-answer --confirm-command install
 
-curl -O https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/LLVM-19.1.7-macOS-ARM64.tar.xz
+wget https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/LLVM-19.1.7-macOS-ARM64.tar.xz
 tar -xvf LLVM-19.1.7-macOS-ARM64.tar.xz
 
 export LLVM_DIR="$WORKDIR/LLVM-19.1.7-macOS-ARM64"

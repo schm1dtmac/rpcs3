@@ -334,10 +334,12 @@ endif()
 
 
 # GLEW
-add_library(3rdparty_glew INTERFACE)
-if(NOT MSVC AND NOT ANDROID)
-	find_package(GLEW REQUIRED)
-	target_link_libraries(3rdparty_glew INTERFACE GLEW::GLEW)
+if(NOT APPLE)
+	add_library(3rdparty_glew INTERFACE)
+	if(NOT MSVC AND NOT ANDROID)
+		find_package(GLEW REQUIRED)
+		target_link_libraries(3rdparty_glew INTERFACE GLEW::GLEW)
+	endif()
 endif()
 
 

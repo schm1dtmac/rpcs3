@@ -50,8 +50,7 @@ sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --
 curl -O https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/refs/heads/master/build.sh
 
 mkdir -p ffmpeg-build
-cd ffmpeg-build
-curl -L https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/bd7dcd05a030e4ef38665e045571dd64f71823b4/build.sh | sh
+git clone --depth=1 --branch bd7dcd0 https://github.com/Vargol/ffmpeg-apple-arm64-build.git
 cd "$WORKDIR"
 
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"

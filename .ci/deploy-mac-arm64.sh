@@ -14,12 +14,6 @@ AVVER="${COMM_TAG}-${COMM_COUNT}"
 echo "AVVER=$AVVER" >> ../.ci/ci-vars.env
 
 cd bin
-mkdir "rpcs3.app/Contents/lib/" || true
-
-cp "$(realpath /opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/lib/c++/libc++abi.1.0.dylib)" "rpcs3.app/Contents/Frameworks/libc++abi.1.dylib"
-cp "$(realpath /opt/homebrew/lib/libsharpyuv.0.dylib)" "rpcs3.app/Contents/lib/libsharpyuv.0.dylib"
-cp "$(realpath /opt/homebrew/lib/libintl.8.dylib)" "rpcs3.app/Contents/lib/libintl.8.dylib"
-
 rm -rf "rpcs3.app/Contents/Frameworks/QtPdf.framework" \
 "rpcs3.app/Contents/Frameworks/QtQml.framework" \
 "rpcs3.app/Contents/Frameworks/QtQmlModels.framework" \
@@ -50,10 +44,6 @@ else
   rm -f translations.zip
 fi
 
-# Hack
-install_name_tool -delete_rpath /opt/homebrew/lib RPCS3.app/Contents/MacOS/rpcs3 || echo "Hack for deleting rpath /opt/homebrew/lib not needed"
-install_name_tool -delete_rpath /opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/lib RPCS3.app/Contents/MacOS/rpcs3 || echo "Hack for deleting rpath /opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/lib not needed"
-
 # Need to do this rename hack due to case insensitive filesystem
 mv rpcs3.app RPCS3_.app
 mv RPCS3_.app RPCS3.app
@@ -66,7 +56,7 @@ echo "URL=https://rpcs3.net/quickstart" >> Quickstart.url
 echo "IconIndex=0" >> Quickstart.url
 
 ARCHIVE_FILEPATH="$BUILD_ARTIFACTSTAGINGDIRECTORY/rpcs3-v${COMM_TAG}-${COMM_COUNT}-${COMM_HASH}_macos_arm64.7z"
-"/opt/homebrew/bin/7z" a -mx9 "$ARCHIVE_FILEPATH" RPCS3.app Quickstart.url
+7z a -mx9 "$ARCHIVE_FILEPATH" RPCS3.app Quickstart.url
 FILESIZE=$(stat -f %z "$ARCHIVE_FILEPATH")
 SHA256SUM=$(shasum -a 256 "$ARCHIVE_FILEPATH" | awk '{ print $1 }')
 

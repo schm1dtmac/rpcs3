@@ -1,8 +1,6 @@
 #!/bin/sh -ex
 
 # shellcheck disable=SC2086
-export CXX=clang++
-export CC=clang
 export CMAKE_EXTRA_OPTS='-DLLVM_TARGETS_TO_BUILD=AArch64'
 
 export WORKDIR;
@@ -41,6 +39,8 @@ tar -xvf LLVM-19.1.7-macOS-ARM64.tar.xz
 export LLVM_DIR="$WORKDIR/LLVM-19.1.7-macOS-ARM64"
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export PATH="$WORKDIR/LLVM-19.1.7-macOS-ARM64/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$PATH"
+export CXX="$WORKDIR/LLVM-19.1.7-macOS-ARM64/bin/clang++"
+export CC="$WORKDIR/LLVM-19.1.7-macOS-ARM64/bin/clang"
 
 export VULKAN_SDK
 VULKAN_SDK="$WORKDIR/VulkanSDK/macOS"

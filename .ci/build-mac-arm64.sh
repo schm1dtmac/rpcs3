@@ -49,8 +49,9 @@ unzip vulkan_sdk.zip
 sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
 curl -O https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/refs/heads/master/build.sh
 
-mkdir -p ffmpeg-build
-git clone --depth=1 --branch bd7dcd0 https://github.com/Vargol/ffmpeg-apple-arm64-build.git
+git clone --depth=1 --branch bd7dcd0 https://github.com/Vargol/ffmpeg-apple-arm64-build.git ffmpeg-build
+cd ffmpeg-build
+./build.sh
 cd "$WORKDIR"
 
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"

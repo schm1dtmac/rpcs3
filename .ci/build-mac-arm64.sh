@@ -47,12 +47,6 @@ ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
 curl -O https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
 unzip vulkan_sdk.zip
 sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
-curl -O https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/refs/heads/master/build.sh
-
-git clone --depth=1 --revision=bd7dcd05a030e4ef38665e045571dd64f71823b4 https://github.com/Vargol/ffmpeg-apple-arm64-build.git ffmpeg-build
-cd ffmpeg-build
-./build.sh
-cd "$WORKDIR"
 
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
@@ -68,9 +62,6 @@ export VULKAN_SDK
 VULKAN_SDK=~/VulkanSDK/macOS
 ln -s "$VULKAN_SDK/lib/libMoltenVK.dylib" "$VULKAN_SDK/lib/libvulkan.dylib" || true
 export VK_ICD_FILENAMES="$VULKAN_SDK/share/vulkan/icd.d/MoltenVK_icd.json"
-
-export FFMPEG_DIR
-FFMPEG_DIR="$WORKDIR/ffmpeg-build/out"
 
 export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"
@@ -94,7 +85,7 @@ export MACOSX_DEPLOYMENT_TARGET=14.0
     -DUSE_ALSA=OFF \
     -DUSE_PULSE=OFF \
     -DUSE_AUDIOUNIT=ON \
-    -DUSE_SYSTEM_FFMPEG=ON \
+    -DUSE_SYSTEM_FFMPEG=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_BUILD_RUNTIME=OFF \
     -DLLVM_BUILD_TOOLS=OFF \

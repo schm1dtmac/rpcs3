@@ -1,20 +1,8 @@
 #!/bin/sh -ex
 
 # shellcheck disable=SC2086
-export HOMEBREW_NO_AUTO_UPDATE=1
-export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
-export HOMEBREW_NO_ENV_HINTS=1
-export HOMEBREW_NO_INSTALL_CLEANUP=1
-
-brew install -f --overwrite --quiet glew sdl3
-
 export CXX=clang++
 export CC=clang
-
-export BREW_PATH;
-BREW_PATH="$(brew --prefix)"
-export BREW_BIN="/opt/homebrew/bin"
-export BREW_SBIN="/opt/homebrew/sbin"
 export CMAKE_EXTRA_OPTS='-DLLVM_TARGETS_TO_BUILD=AArch64'
 
 export WORKDIR;
@@ -48,14 +36,7 @@ unzip vulkan_sdk.zip
 sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
 
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
-export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
-
-export PATH="$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$BREW_BIN:$BREW_SBIN:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"
-export LDFLAGS="-L$BREW_PATH/lib $BREW_PATH/lib/libSDL3.dylib $BREW_PATH/lib/libGLEW.dylib -Wl,-rpath,$BREW_PATH/lib"
-export CPPFLAGS="-I$BREW_PATH/include -no-pie -D__MAC_OS_X_VERSION_MIN_REQUIRED=140000"
-export CFLAGS="-D__MAC_OS_X_VERSION_MIN_REQUIRED=140000"
-export LIBRARY_PATH="$BREW_PATH/lib"
-export LD_LIBRARY_PATH="$BREW_PATH/lib"
+export PATH="$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$PATH"
 
 export VULKAN_SDK
 VULKAN_SDK=~/VulkanSDK/macOS
@@ -64,7 +45,7 @@ export VK_ICD_FILENAMES="$VULKAN_SDK/share/vulkan/icd.d/MoltenVK_icd.json"
 
 # exclude ffmpeg, LLVM, opencv, and sdl from submodule update
 # shellcheck disable=SC2046
-git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/opencv/ && !/SDL/ && !/feralinteractive/ { print $3 }' .gitmodules)
+git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/opencv/ && !/feralinteractive/ { print $3 }' .gitmodules)
 
 # 3rdparty fixes
 sed -i '' "s/extern const double NSAppKitVersionNumber;/const double NSAppKitVersionNumber = 1343;/g" 3rdparty/hidapi/hidapi/mac/hid.c
@@ -97,19 +78,17 @@ export MACOSX_DEPLOYMENT_TARGET=14.0
     -DUSE_NATIVE_INSTRUCTIONS=OFF \
     -DUSE_SYSTEM_MVK=ON \
     -DUSE_SYSTEM_FAUDIO=OFF \
-    -DUSE_SYSTEM_SDL=ON \
+    -DUSE_SYSTEM_SDL=OFF \
     -DUSE_SYSTEM_OPENCV=ON \
     "$CMAKE_EXTRA_OPTS" \
     -DLLVM_TARGET_ARCH=AArch64 \
     -DCMAKE_OSX_ARCHITECTURES=arm64 \
-    -DCMAKE_IGNORE_PATH="$BREW_PATH/lib" \
-    -DCMAKE_IGNORE_PREFIX_PATH=/opt/homebrew/opt \
     -DCMAKE_CXX_FLAGS="-D__MAC_OS_X_VERSION_MIN_REQUIRED=140000" \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_OSX_SYSROOT="$(xcrun --sdk macosx --show-sdk-path)" \
     -G Ninja
 
-"$BREW_PATH/bin/ninja"; build_status=$?;
+ninja; build_status=$?;
 
 cd ..
 

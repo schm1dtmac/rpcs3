@@ -6,12 +6,8 @@ export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-brew install -f --overwrite --quiet ffmpeg@5 "llvm@$LLVM_COMPILER_VER" glew sdl3
-brew link -f --quiet "llvm@$LLVM_COMPILER_VER" ffmpeg@5
-
-curl -O https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
-unzip vulkan_sdk.zip
-sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
+brew install -f --overwrite --quiet "llvm@$LLVM_COMPILER_VER" glew sdl3
+brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 
 export CXX=clang++
 export CC=clang
@@ -48,11 +44,22 @@ fi
 cd "$WORKDIR"
 ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
 
+curl -O https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
+unzip vulkan_sdk.zip
+sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
+curl -O https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/refs/heads/master/build.sh
+
+mkdir -p ffmpeg-build
+cd ffmpeg-build
+curl -O https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/refs/heads/master/build.sh
+./build.sh
+cd "$WORKDIR"
+
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 
 export PATH="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$BREW_BIN:$BREW_SBIN:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"
-export LDFLAGS="-L$BREW_PATH/lib $BREW_PATH/opt/ffmpeg@5/lib/libavcodec.dylib $BREW_PATH/opt/ffmpeg@5/lib/libavformat.dylib $BREW_PATH/opt/ffmpeg@5/lib/libavutil.dylib $BREW_PATH/opt/ffmpeg@5/lib/libswscale.dylib $BREW_PATH/opt/ffmpeg@5/lib/libswresample.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++/libc++.1.dylib $BREW_PATH/lib/libSDL3.dylib $BREW_PATH/lib/libGLEW.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind/libunwind.1.dylib -Wl,-rpath,$BREW_PATH/lib"
+export LDFLAGS="-L$BREW_PATH/lib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++/libc++.1.dylib $BREW_PATH/lib/libSDL3.dylib $BREW_PATH/lib/libGLEW.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind/libunwind.1.dylib -Wl,-rpath,$BREW_PATH/lib"
 export CPPFLAGS="-I$BREW_PATH/include -I$BREW_PATH/include -no-pie -D__MAC_OS_X_VERSION_MIN_REQUIRED=140000"
 export CFLAGS="-D__MAC_OS_X_VERSION_MIN_REQUIRED=140000"
 export LIBRARY_PATH="$BREW_PATH/lib"
@@ -62,6 +69,9 @@ export VULKAN_SDK
 VULKAN_SDK=~/VulkanSDK/macOS
 ln -s "$VULKAN_SDK/lib/libMoltenVK.dylib" "$VULKAN_SDK/lib/libvulkan.dylib" || true
 export VK_ICD_FILENAMES="$VULKAN_SDK/share/vulkan/icd.d/MoltenVK_icd.json"
+
+export FFMPEG_DIR
+FFMPEG_DIR="$WORKDIR/ffmpeg-build/out"
 
 export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"

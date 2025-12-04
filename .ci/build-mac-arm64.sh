@@ -51,8 +51,7 @@ curl -O https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/refs/heads/master
 
 mkdir -p ffmpeg-build
 cd ffmpeg-build
-curl -O https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/refs/heads/master/build.sh
-./build.sh
+curl -L https://github.com/Vargol/ffmpeg-apple-arm64-build/raw/bd7dcd05a030e4ef38665e045571dd64f71823b4/build.sh | sh
 cd "$WORKDIR"
 
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"

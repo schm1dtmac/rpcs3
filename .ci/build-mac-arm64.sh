@@ -8,7 +8,7 @@ export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 brew install -f --overwrite --quiet opencv@4 "llvm@$LLVM_COMPILER_VER" glew sdl3
 brew unlink --quiet ffmpeg qtbase qtsvg qtdeclarative
-brew link -f --quiet "llvm@$LLVM_COMPILER_VER" ffmpeg@5
+brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 
 curl -O https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
 unzip vulkan_sdk.zip

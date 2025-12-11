@@ -7,11 +7,23 @@ export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 brew install -f --overwrite --quiet "llvm@$LLVM_COMPILER_VER"
-brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 
 curl -O https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
 unzip vulkan_sdk.zip
 sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
+
+git clone https://github.com/opencv/opencv.git
+mkdir build_opencv; cd build_opencv
+pip3 install numpy --break-system-packages 
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_opencv_apps=OFF -DBUILD_SHARED_LIBS=OFF ../opencv
+make -j8; cd ../
+
+git clone https://github.com/nigels-com/glew.git
+cd build
+cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
+make -j8; cd ../
+
+brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 
 export CXX=clang++
 export CC=clang
@@ -47,13 +59,6 @@ fi
 
 cd "$WORKDIR"
 ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
-
-git clone https://github.com/opencv/opencv.git
-mkdir build_opencv; cd build_opencv
-pip3 install numpy --break-system-packages 
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ../opencv
-make -j8
-cd "$WORKDIR" 
 
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export OpenCV_DIR="$WORKDIR/build_opencv"

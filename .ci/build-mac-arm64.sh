@@ -24,8 +24,8 @@ cd glew-2.2.0/build
 cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
 make -j8; sudo make install; cd ../../
 
-wget https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.dmg
-open SDL3-3.2.28.dmg; sudo cp -R /Volumes/SDL3/ /Library/Frameworks
+wget -O SDL3.dmg https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.dmg
+hdiutil mount SDL3.dmg; sudo cp -R /Volumes/SDL3/ /Library/Frameworks
 
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 

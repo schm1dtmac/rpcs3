@@ -8,6 +8,9 @@ if(CCACHE_PATH)
 endif()
 
 project(rpcs3 LANGUAGES C CXX)
+if(APPLE)
+    enable_language(OBJC)
+endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

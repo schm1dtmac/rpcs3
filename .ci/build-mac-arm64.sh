@@ -21,7 +21,7 @@ make -j8; cd ../
 wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip
 unzip glew-2.2.0.zip
 cd glew-2.2.0/build
-cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
+cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
 make -j8; cd ../../
 
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER"

@@ -24,6 +24,9 @@ cd glew-2.2.0/build
 cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
 make -j8; sudo make install; cd ../../
 
+wget https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.dmg
+open SDL3-3.2.28.dmg; sudo cp -R /Volumes/SDL3/ /Library/Frameworks
+
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 
 export CXX=clang++
@@ -78,7 +81,7 @@ export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"
 # exclude ffmpeg, LLVM, opencv, and sdl from submodule update
 # shellcheck disable=SC2046
-git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/llvm/ && !/opencv/ && !/feralinteractive/ { print $3 }' .gitmodules)
+git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/llvm/ && !/opencv/ && !/SDL/ && !/feralinteractive/ { print $3 }' .gitmodules)
 
 # 3rdparty fixes
 sed -i '' "s/extern const double NSAppKitVersionNumber;/const double NSAppKitVersionNumber = 1343;/g" 3rdparty/hidapi/hidapi/mac/hid.c
@@ -110,7 +113,7 @@ export MACOSX_DEPLOYMENT_TARGET=14.0
     -DUSE_NATIVE_INSTRUCTIONS=OFF \
     -DUSE_SYSTEM_MVK=ON \
     -DUSE_SYSTEM_FAUDIO=OFF \
-    -DUSE_SYSTEM_SDL=OFF \
+    -DUSE_SYSTEM_SDL=ON \
     -DUSE_SYSTEM_OPENCV=ON \
     "$CMAKE_EXTRA_OPTS" \
     -DLLVM_TARGET_ARCH=arm64 \

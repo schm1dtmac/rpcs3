@@ -19,9 +19,9 @@ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUIL
 make -j8; cd ../
 
 git clone https://github.com/nigels-com/glew.git
-cd build
+cd glew/build
 cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
-make -j8; cd ../
+make -j8; cd ../../
 
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 

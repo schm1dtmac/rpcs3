@@ -8,7 +8,7 @@ export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 brew install -f --overwrite --quiet "llvm@$LLVM_COMPILER_VER"
 
-curl -O https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
+wget https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
 unzip vulkan_sdk.zip
 sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
 
@@ -18,8 +18,9 @@ pip3 install numpy --break-system-packages
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_opencv_apps=OFF -DBUILD_SHARED_LIBS=OFF ../opencv
 make -j8; cd ../
 
-git clone https://github.com/nigels-com/glew.git
-cd glew/build
+wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip
+unzip glew-2.2.0.zip
+cd glew-2.2.0/build
 cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
 make -j8; cd ../../
 

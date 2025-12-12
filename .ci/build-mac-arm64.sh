@@ -18,14 +18,14 @@ pip3 install numpy --break-system-packages
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_opencv_apps=OFF -DBUILD_SHARED_LIBS=OFF ../opencv
 make -j8; cd ../
 
-wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip
-unzip glew-2.2.0.zip
-cd glew-2.2.0/build
-cmake ./cmake -DBUILD_FRAMEWORK=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
+wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip; unzip glew-2.2.0.zip; cd glew-2.2.0/build
+cmake ./cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
 make -j8; sudo make install; cd ../../
 
-wget -O SDL3.dmg https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.dmg
-hdiutil mount SDL3.dmg; sudo cp -R /Volumes/SDL3/ /Library/Frameworks
+wget https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.zip; unzip SDL3-3.2.28; cd SDL3-3.2.28
+cmake -S . -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+cmake --build build
+cmake --install build --prefix ~/SDL
 
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 

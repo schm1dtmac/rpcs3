@@ -6,6 +6,9 @@ export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
+export WORKDIR;
+WORKDIR="$(pwd)"
+
 brew install -f --overwrite --quiet "llvm@$LLVM_COMPILER_VER"
 
 wget https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
@@ -16,16 +19,17 @@ git clone https://github.com/opencv/opencv.git
 mkdir build_opencv; cd build_opencv
 pip3 install numpy --break-system-packages 
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_opencv_apps=OFF -DBUILD_SHARED_LIBS=OFF ../opencv
-make -j8; cd ../
+make -j8; cd "$WORKDIR"
 
 wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip; unzip glew-2.2.0.zip; cd glew-2.2.0/build
-cmake ./cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/Library/Frameworks
-make -j8; sudo make install; cd ../../
+cmake ./cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=$WORKDIR/GLEW
+make -j8; sudo make install; cd "$WORKDIR"
 
 wget https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.zip; unzip SDL3-3.2.28; cd SDL3-3.2.28
 cmake -S . -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 cmake --build build
-cmake --install build --prefix ~/SDL
+cmake --install build --prefix $WORKDIR/SDL3
+cd "$WORKDIR"
 
 brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 
@@ -37,9 +41,6 @@ BREW_PATH="$(brew --prefix)"
 export BREW_BIN="/opt/homebrew/bin"
 export BREW_SBIN="/opt/homebrew/sbin"
 export CMAKE_EXTRA_OPTS='-DLLVM_TARGETS_TO_BUILD=arm64'
-
-export WORKDIR;
-WORKDIR="$(pwd)"
 
 # Setup ccache
 if [ ! -d "$CCACHE_DIR" ]; then
@@ -64,6 +65,8 @@ fi
 cd "$WORKDIR"
 ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
 
+export SDL3_DIR="$WORKDIR/SDL3"
+export GLEW_DIR="$WORKDIR/GLEW"
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export OpenCV_DIR="$WORKDIR/build_opencv"
 export PATH="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$BREW_BIN:$BREW_SBIN:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"

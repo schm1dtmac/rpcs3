@@ -26,7 +26,7 @@ cmake ./cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE
 make -j8; sudo make install; cd "$WORKDIR"
 
 wget https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.zip; unzip SDL3-3.2.28; cd SDL3-3.2.28
-cmake -S . -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+cmake -S . -B build -DSDL_HIDAPI=ON -DSDL_WAYLAND=OFF -DBUILD_SHARED_LIBS=OFF -DSDL_X11=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 cmake --build build
 cmake --install build --prefix $WORKDIR/SDL3
 cd "$WORKDIR"

@@ -6,16 +6,32 @@ export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-brew install -f --overwrite --quiet pipenv googletest opencv@4 ffmpeg@5 "llvm@$LLVM_COMPILER_VER" glew sdl3 vulkan-headers vulkan-loader
-brew unlink --quiet ffmpeg qtbase qtsvg qtdeclarative
+export WORKDIR;
+WORKDIR="$(pwd)"
 
-brew link -f --quiet "llvm@$LLVM_COMPILER_VER" ffmpeg@5
+brew install -f --overwrite --quiet "llvm@$LLVM_COMPILER_VER"
 
-# moltenvk based on commit for 1.4.0 release
-export HOMEBREW_DEVELOPER=1 # Prevents blocking of local formulae
-wget https://raw.githubusercontent.com/Homebrew/homebrew-core/ea2bec5f1f4384e188d7fc0702ab21a20a2ced08/Formula/m/molten-vk.rb
-/opt/homebrew/bin/brew install -f --overwrite --formula --quiet ./molten-vk.rb
-export HOMEBREW_DEVELOPER=0
+wget https://sdk.lunarg.com/sdk/download/1.4.328.1/mac/vulkan_sdk.zip
+unzip vulkan_sdk.zip
+sudo ./vulkansdk-macOS-1.4.328.1.app/Contents/MacOS/vulkansdk-macOS-1.4.328.1 --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
+
+git clone https://github.com/opencv/opencv.git
+mkdir build_opencv; cd build_opencv
+pip3 install numpy --break-system-packages 
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_opencv_apps=OFF -DBUILD_SHARED_LIBS=OFF ../opencv
+make -j8; cd "$WORKDIR"
+
+wget https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip; unzip glew-2.2.0.zip; cd glew-2.2.0/build
+cmake ./cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=$WORKDIR/GLEW
+make -j8; sudo make install; cd "$WORKDIR"
+
+wget https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.zip; unzip SDL3-3.2.28; cd SDL3-3.2.28
+cmake -S . -B build -DSDL_HIDAPI=ON -DSDL_WAYLAND=OFF -DBUILD_SHARED_LIBS=OFF -DSDL_X11=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+cmake --build build
+cmake --install build --prefix $WORKDIR/SDL3
+cd "$WORKDIR"
+
+brew link -f --quiet "llvm@$LLVM_COMPILER_VER"
 
 export CXX=clang++
 export CC=clang
@@ -25,9 +41,6 @@ BREW_PATH="$(brew --prefix)"
 export BREW_BIN="/opt/homebrew/bin"
 export BREW_SBIN="/opt/homebrew/sbin"
 export CMAKE_EXTRA_OPTS='-DLLVM_TARGETS_TO_BUILD=arm64'
-
-export WORKDIR;
-WORKDIR="$(pwd)"
 
 # Setup ccache
 if [ ! -d "$CCACHE_DIR" ]; then
@@ -43,35 +56,35 @@ if [ ! -d "/tmp/Qt/$QT_VER" ]; then
   sed -i '' "s/'qt{0}_{0}{1}{2}'.format(major, minor, patch)]))/'qt{0}_{0}{1}{2}'.format(major, minor, patch), 'qt{0}_{0}{1}{2}'.format(major, minor, patch)]))/g" qt-downloader
   sed -i '' "s/'{}\/{}\/qt{}_{}\/'/'{0}\/{1}\/qt{2}_{3}\/qt{2}_{3}\/'/g" qt-downloader
   cd "/tmp/Qt"
-  "$BREW_PATH/bin/pipenv" run pip3 uninstall py7zr requests semantic_version lxml
-  "$BREW_PATH/bin/pipenv" run pip3 install py7zr requests semantic_version lxml  --no-cache
+  pip3 install py7zr requests semantic_version lxml --break-system-packages --no-cache
   mkdir -p "$QT_VER/macos" ; ln -s "macos" "$QT_VER/clang_64"
   sed -i '' 's/args\.version \/ derive_toolchain_dir(args) \/ //g' "$WORKDIR/qt-downloader/qt-downloader"
-  "$BREW_PATH/bin/pipenv" run "$WORKDIR/qt-downloader/qt-downloader" macos desktop "$QT_VER" clang_64 --opensource --addons qtmultimedia qtimageformats -o "$QT_VER/clang_64"
+  python3 "$WORKDIR/qt-downloader/qt-downloader" macos desktop "$QT_VER" clang_64 --opensource --addons qtmultimedia qtimageformats -o "$QT_VER/clang_64"
 fi
 
 cd "$WORKDIR"
 ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
 
+export SDL3_DIR="$WORKDIR/SDL3"
+export GLEW_DIR="$WORKDIR/GLEW"
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
-export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
-
+export OpenCV_DIR="$WORKDIR/build_opencv"
 export PATH="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$BREW_BIN:$BREW_SBIN:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"
-export LDFLAGS="-L$BREW_PATH/lib $BREW_PATH/opt/ffmpeg@5/lib/libavcodec.dylib $BREW_PATH/opt/ffmpeg@5/lib/libavformat.dylib $BREW_PATH/opt/ffmpeg@5/lib/libavutil.dylib $BREW_PATH/opt/ffmpeg@5/lib/libswscale.dylib $BREW_PATH/opt/ffmpeg@5/lib/libswresample.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++/libc++.1.dylib $BREW_PATH/lib/libSDL3.dylib $BREW_PATH/lib/libGLEW.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind/libunwind.1.dylib -Wl,-rpath,$BREW_PATH/lib"
-export CPPFLAGS="-I$BREW_PATH/include -no-pie -D__MAC_OS_X_VERSION_MIN_REQUIRED=144000"
+export LDFLAGS="-L$BREW_PATH/lib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++/libc++.1.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind/libunwind.1.dylib -Wl,-rpath,$BREW_PATH/lib"
+export CPPFLAGS="-I$BREW_PATH/include -D__MAC_OS_X_VERSION_MIN_REQUIRED=144000"
 export CFLAGS="-D__MAC_OS_X_VERSION_MIN_REQUIRED=144000"
 export LIBRARY_PATH="$BREW_PATH/lib"
 export LD_LIBRARY_PATH="$BREW_PATH/lib"
 
 export VULKAN_SDK
-VULKAN_SDK="$BREW_PATH/opt/molten-vk"
-ln -s "$BREW_PATH/opt/vulkan-loader/lib/libvulkan.dylib" "$VULKAN_SDK/lib/libvulkan.dylib" || true
+VULKAN_SDK=~/VulkanSDK/macOS
+ln -s "$VULKAN_SDK/lib/libvulkan.dylib" "$VULKAN_SDK/lib/libvulkan.dylib" || true
 
 export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"
 # exclude ffmpeg, LLVM, opencv, and sdl from submodule update
 # shellcheck disable=SC2046
-git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/ffmpeg/ && !/llvm/ && !/opencv/ && !/SDL/ && !/feralinteractive/ { print $3 }' .gitmodules)
+git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/llvm/ && !/opencv/ && !/SDL/ && !/feralinteractive/ { print $3 }' .gitmodules)
 
 # 3rdparty fixes
 sed -i '' "s/extern const double NSAppKitVersionNumber;/const double NSAppKitVersionNumber = 1343;/g" 3rdparty/hidapi/hidapi/mac/hid.c
@@ -81,15 +94,15 @@ mkdir build && cd build || exit 1
 export MACOSX_DEPLOYMENT_TARGET=14.4
 
 "$BREW_PATH/bin/cmake" .. \
-    -DBUILD_RPCS3_TESTS="${RUN_UNIT_TESTS}" \
-    -DRUN_RPCS3_TESTS="${RUN_UNIT_TESTS}" \
+    -DBUILD_RPCS3_TESTS=OFF \
+    -DRUN_RPCS3_TESTS=OFF \
     -DUSE_SDL=ON \
     -DUSE_DISCORD_RPC=ON \
     -DUSE_VULKAN=ON \
     -DUSE_ALSA=OFF \
     -DUSE_PULSE=OFF \
     -DUSE_AUDIOUNIT=ON \
-    -DUSE_SYSTEM_FFMPEG=ON \
+    -DUSE_SYSTEM_FFMPEG=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_BUILD_RUNTIME=OFF \
     -DLLVM_BUILD_TOOLS=OFF \

@@ -48,7 +48,7 @@ export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN
 export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 
 export PATH="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$BREW_BIN:$BREW_SBIN:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"
-export LDFLAGS="-L$BREW_PATH/lib -Wl,-rpath,@executable_path/../Frameworks"
+export LDFLAGS="-L$BREW_PATH/lib -L$BREW_PATH/opt/llvm/lib/c++ -L$BREW_PATH/opt/llvm/lib/unwind -lunwind -Wl,-rpath,@executable_path/../Frameworks"
 export CPPFLAGS="-I$BREW_PATH/include -D__MAC_OS_X_VERSION_MIN_REQUIRED=144000"
 export CFLAGS="-D__MAC_OS_X_VERSION_MIN_REQUIRED=144000"
 export LIBRARY_PATH="$BREW_PATH/lib"

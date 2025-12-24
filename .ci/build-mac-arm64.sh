@@ -6,16 +6,9 @@ export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-brew install -f --overwrite --quiet googletest opencv@4 ffmpeg@5 "llvm@$LLVM_COMPILER_VER" sdl3 vulkan-headers vulkan-loader
-brew unlink --quiet ffmpeg qtbase qtsvg qtdeclarative
-
-brew link -f --quiet "llvm@$LLVM_COMPILER_VER" ffmpeg@5
-
-# moltenvk based on commit for 1.4.0 release
-export HOMEBREW_DEVELOPER=1 # Prevents blocking of local formulae
-wget https://raw.githubusercontent.com/Homebrew/homebrew-core/ea2bec5f1f4384e188d7fc0702ab21a20a2ced08/Formula/m/molten-vk.rb
-/opt/homebrew/bin/brew install -f --overwrite --formula --quiet ./molten-vk.rb
-export HOMEBREW_DEVELOPER=0
+brew install -f --overwrite --quiet googletest opencv@4 "llvm@$LLVM_COMPILER_VER" sdl3 vulkan-headers vulkan-loader molten-vk 
+brew unlink --quiet qtbase qtsvg qtdeclarative
+brew link -f --quiet "llvm@$LLVM_COMPILER_VER" 
 
 export CXX=clang++
 export CC=clang
@@ -24,7 +17,6 @@ export BREW_PATH;
 BREW_PATH="$(brew --prefix)"
 export BREW_BIN="/opt/homebrew/bin"
 export BREW_SBIN="/opt/homebrew/sbin"
-export CMAKE_EXTRA_OPTS='-DLLVM_TARGETS_TO_BUILD=arm64'
 
 export WORKDIR;
 WORKDIR="$(pwd)"
@@ -56,7 +48,7 @@ export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN
 export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 
 export PATH="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/bin:$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:$BREW_BIN:$BREW_SBIN:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"
-export LDFLAGS="-L$BREW_PATH/lib $BREW_PATH/opt/ffmpeg@5/lib/libavcodec.dylib $BREW_PATH/opt/ffmpeg@5/lib/libavformat.dylib $BREW_PATH/opt/ffmpeg@5/lib/libavutil.dylib $BREW_PATH/opt/ffmpeg@5/lib/libswscale.dylib $BREW_PATH/opt/ffmpeg@5/lib/libswresample.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++/libc++.1.dylib $BREW_PATH/lib/libSDL3.dylib $BREW_PATH/lib/libGLEW.dylib $BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind/libunwind.1.dylib -Wl,-rpath,$BREW_PATH/lib"
+export LDFLAGS="-L$BREW_PATH/lib -Wl,-rpath,@executable_path/../Frameworks"
 export CPPFLAGS="-I$BREW_PATH/include -D__MAC_OS_X_VERSION_MIN_REQUIRED=144000"
 export CFLAGS="-D__MAC_OS_X_VERSION_MIN_REQUIRED=144000"
 export LIBRARY_PATH="$BREW_PATH/lib"
@@ -70,7 +62,7 @@ export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"
 # exclude ffmpeg, LLVM, opencv, and sdl from submodule update
 # shellcheck disable=SC2046
-git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/ffmpeg/ && !/llvm/ && !/opencv/ && !/SDL/ && !/feralinteractive/ { print $3 }' .gitmodules)
+git submodule -q update --init --depth=1 --jobs=8 $(awk '/path/ && !/llvm/ && !/opencv/ && !/SDL/ && !/feralinteractive/ { print $3 }' .gitmodules)
 
 mkdir build && cd build || exit 1
 
@@ -85,7 +77,7 @@ export MACOSX_DEPLOYMENT_TARGET=14.4
     -DUSE_ALSA=OFF \
     -DUSE_PULSE=OFF \
     -DUSE_AUDIOUNIT=ON \
-    -DUSE_SYSTEM_FFMPEG=ON \
+    -DUSE_SYSTEM_FFMPEG=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_BUILD_RUNTIME=OFF \
     -DLLVM_BUILD_TOOLS=OFF \
@@ -101,11 +93,10 @@ export MACOSX_DEPLOYMENT_TARGET=14.4
     -DUSE_SYSTEM_FAUDIO=OFF \
     -DUSE_SYSTEM_SDL=ON \
     -DUSE_SYSTEM_OPENCV=ON \
-    "$CMAKE_EXTRA_OPTS" \
+    -DLLVM_TARGETS_TO_BUILD=arm64 \
     -DLLVM_TARGET_ARCH=arm64 \
+    -DSTATIC_LINK_LLVM=ON \
     -DCMAKE_OSX_ARCHITECTURES=arm64 \
-    -DCMAKE_IGNORE_PATH="$BREW_PATH/lib" \
-    -DCMAKE_IGNORE_PREFIX_PATH=/opt/homebrew/opt \
     -DCMAKE_CXX_FLAGS="-D__MAC_OS_X_VERSION_MIN_REQUIRED=144000" \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_OSX_SYSROOT="$(xcrun --sdk macosx --show-sdk-path)" \

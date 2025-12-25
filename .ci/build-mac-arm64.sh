@@ -44,8 +44,6 @@ fi
 cd "$WORKDIR"
 ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
 
-rm -rf "$BREW_PATH/opt/opencv/lib"/libopencv_*.dylib
-
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 
@@ -95,6 +93,7 @@ export MACOSX_DEPLOYMENT_TARGET=14.4
     -DUSE_SYSTEM_FAUDIO=OFF \
     -DUSE_SYSTEM_SDL=ON \
     -DUSE_SYSTEM_OPENCV=ON \
+    -DOpenCV_STATIC=ON \
     -DLLVM_TARGETS_TO_BUILD=AArch64 \
     -DLLVM_TARGET_ARCH=AArch64 \
     -DSTATIC_LINK_LLVM=ON \

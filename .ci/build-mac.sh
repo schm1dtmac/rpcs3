@@ -60,7 +60,7 @@ export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN
 export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 
 export PATH="/opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/bin:$PATH"
-export LDFLAGS="-L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++ -L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind -lunwind $BREW_PATH/opt/opencv@4/lib/lib*.a"
+export LDFLAGS="-L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++ -L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind -lunwind $BREW_PATH/opt/opencv@4/lib/opencv4/3rdparty/lib*.a $BREW_PATH/opt/opencv@4/lib/lib*.a"
 
 export VULKAN_SDK
 VULKAN_SDK="$BREW_PATH/opt/molten-vk"

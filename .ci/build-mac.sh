@@ -19,7 +19,7 @@ fi
 export CXX=clang++
 export CC=clang
 
-export BREW_PATH;
+export BREW_PATH
 if [ "$AARCH64" -eq 1 ]; then
   BREW_PATH="$(brew --prefix)"
   export BREW_BIN="/opt/homebrew/bin"
@@ -30,7 +30,7 @@ else
   export BREW_SBIN="/usr/local/sbin"
 fi
 
-export WORKDIR;
+export WORKDIR
 WORKDIR="$(pwd)"
 
 # Setup ccache
@@ -60,7 +60,8 @@ export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN
 export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 
 export PATH="/opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/bin:$PATH"
-export LDFLAGS="-L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++ -L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind -lunwind $(pkg-config --libs --static opencv)"
+export LDFLAGS
+LDFLAGS="-L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++ -L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind -lunwind $(pkg-config --libs --static opencv)"
 
 export VULKAN_SDK
 VULKAN_SDK="$BREW_PATH/opt/molten-vk"

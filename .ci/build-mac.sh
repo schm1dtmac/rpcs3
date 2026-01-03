@@ -61,7 +61,7 @@ export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 
 export PATH="/opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/bin:$PATH"
 export LDFLAGS
-LDFLAGS="-L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++ -L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind -lunwind $(pkg-config --libs --static opencv4 | sed -E "s/-l([A-Za-z0-9_]*)/$BREW_PATH\/opt\/opencv4\/lib\1.a/g")"
+LDFLAGS="-L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++ -L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind -lunwind $(pkg-config --libs --static opencv4 | sed -E "s/-l([A-Za-z0-9_]*)/\/opt\/homebrew\/opt\/opencv4\/lib\1.a/g")"
 
 export VULKAN_SDK
 VULKAN_SDK="$BREW_PATH/opt/molten-vk"

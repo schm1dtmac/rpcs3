@@ -3135,6 +3135,8 @@ void main_window::CreateConnects()
 
 	connect(ui->actionManage_Screenshots, &QAction::triggered, this, [this]
 	{
+		auto thread = QThread::create([]()
+		{
 		gui_log.error("Starting stress test");
 		const QString path = "C:\\Users\\Megamouse\\Pictures\\Untitled.png";
 		constexpr int iterations = 10000;
@@ -3177,6 +3179,9 @@ void main_window::CreateConnects()
 
 		gui_log.error("QImage: %d ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - mid).count());
 		gui_log.error("Stress test finished with result: %d", succ);
+		});
+		QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+		thread->start();
 
 		//screenshot_manager_dialog* screenshot_manager = new screenshot_manager_dialog();
 		//screenshot_manager->show();

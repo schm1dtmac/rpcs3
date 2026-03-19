@@ -47,6 +47,9 @@
 #include "music_player_dialog.h"
 #include "sound_effect_manager_dialog.h"
 
+#include <QtConcurrent>
+#include <QFutureWatcher>
+#include <chrono>
 #include <thread>
 #include <unordered_set>
 
@@ -3132,8 +3135,51 @@ void main_window::CreateConnects()
 
 	connect(ui->actionManage_Screenshots, &QAction::triggered, this, [this]
 	{
-		screenshot_manager_dialog* screenshot_manager = new screenshot_manager_dialog();
-		screenshot_manager->show();
+		gui_log.error("Starting stress test");
+		const QString path = "C:\\Users\\Megamouse\\Pictures\\Untitled.png";
+		constexpr int iterations = 10000;
+
+		bool succ = true;
+		QPixmap ref;
+		succ &= ref.load(path);
+		QSize size = ref.size();
+		size = QSize(size.width() + 50, size.height() + 50);
+
+		const std::vector<int> indexes(iterations);
+
+		auto start = std::chrono::steady_clock::now();
+		QFutureWatcher<void>* future_watcher = new QFutureWatcher<void>();
+		future_watcher->setFuture(QtConcurrent::map(indexes, [&](int)
+		{
+			QPixmap pxm;
+			succ &= pxm.load("C:\\Users\\Megamouse\\Pictures\\Untitled.png");
+			auto asd = gui::utils::get_aligned_pixmap(pxm, size, 1.0, Qt::FastTransformation, gui::utils::align_h::center, gui::utils::align_v::center);
+			succ &= asd.width() != 0;
+		}));
+
+		future_watcher->waitForFinished();
+		future_watcher->deleteLater();
+		auto mid = std::chrono::steady_clock::now();
+		gui_log.error("QPixmap: %d ms", std::chrono::duration_cast<std::chrono::milliseconds>(mid - start).count());
+
+		future_watcher = new QFutureWatcher<void>();
+		future_watcher->setFuture(QtConcurrent::map(indexes, [&](int)
+		{
+			QImage img;
+			succ &= img.load("C:\\Users\\Megamouse\\Pictures\\Untitled.png");
+			auto asd = gui::utils::get_aligned_image(img, size, 1.0, Qt::FastTransformation, gui::utils::align_h::center, gui::utils::align_v::center);
+			succ &= asd.width() != 0;
+		}));
+
+		future_watcher->waitForFinished();
+		future_watcher->deleteLater();
+		auto end = std::chrono::steady_clock::now();
+
+		gui_log.error("QImage: %d ms", std::chrono::duration_cast<std::chrono::milliseconds>(end - mid).count());
+		gui_log.error("Stress test finished with result: %d", succ);
+
+		//screenshot_manager_dialog* screenshot_manager = new screenshot_manager_dialog();
+		//screenshot_manager->show();
 	});
 
 	connect(ui->actionManage_SoundEffects, &QAction::triggered, this, [this]

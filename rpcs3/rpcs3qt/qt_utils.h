@@ -128,6 +128,7 @@ namespace gui
 
 		// Returns a scaled, aligned QPixmap
 		QPixmap get_aligned_pixmap(QPixmap pixmap, const QSize& icon_size, qreal device_pixel_ratio, Qt::TransformationMode mode, align_h h_alignment, align_v v_alignment);
+		QImage get_aligned_image(QImage pixmap, const QSize& icon_size, qreal device_pixel_ratio, Qt::TransformationMode mode, align_h h_alignment, align_v v_alignment);
 
 		// Returns a scaled, aligned QPixmap
 		QPixmap get_aligned_pixmap(const QString& path, const QSize& icon_size, qreal device_pixel_ratio, Qt::TransformationMode mode, align_h h_alignment, align_v v_alignment);

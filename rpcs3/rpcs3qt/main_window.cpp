@@ -3138,7 +3138,7 @@ void main_window::CreateConnects()
 		auto thread = QThread::create([]()
 		{
 		gui_log.error("Starting stress test");
-		const QString path = "C:\\Users\\Megamouse\\Pictures\\Untitled.png";
+		const QString path = "/Users/dan/fuck/test.png";
 		constexpr int iterations = 10000;
 
 		bool succ = true;
@@ -3154,7 +3154,7 @@ void main_window::CreateConnects()
 		future_watcher->setFuture(QtConcurrent::map(indexes, [&](int)
 		{
 			QPixmap pxm;
-			succ &= pxm.load("C:\\Users\\Megamouse\\Pictures\\Untitled.png");
+			succ &= pxm.load("/Users/dan/fuck/test.png");
 			auto asd = gui::utils::get_aligned_pixmap(pxm, size, 1.0, Qt::FastTransformation, gui::utils::align_h::center, gui::utils::align_v::center);
 			succ &= asd.width() != 0;
 		}));
@@ -3168,7 +3168,7 @@ void main_window::CreateConnects()
 		future_watcher->setFuture(QtConcurrent::map(indexes, [&](int)
 		{
 			QImage img;
-			succ &= img.load("C:\\Users\\Megamouse\\Pictures\\Untitled.png");
+			succ &= img.load("/Users/dan/fuck/test.png");
 			auto asd = gui::utils::get_aligned_image(img, size, 1.0, Qt::FastTransformation, gui::utils::align_h::center, gui::utils::align_v::center);
 			succ &= asd.width() != 0;
 		}));

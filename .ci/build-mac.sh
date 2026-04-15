@@ -17,11 +17,11 @@ brew update
 brew install -f --overwrite --quiet ccache "llvm@$LLVM_COMPILER_VER"
 brew link -f --overwrite --quiet "llvm@$LLVM_COMPILER_VER"
 if [ "$AARCH64" -eq 1 ]; then
-  brew install -f --overwrite --quiet googletest opencv@4 sdl3 vulkan-headers vulkan-loader molten-vk
+  brew install -f --overwrite --quiet googletest opencv@4 sdl3 vulkan-headers vulkan-loader
   brew unlink --quiet ffmpeg fmt qtbase qtsvg qtdeclarative protobuf || true
 else
   arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  arch -x86_64 /usr/local/bin/brew install -f --overwrite --quiet python@3.14 opencv@4 "llvm@$LLVM_COMPILER_VER" sdl3 vulkan-headers vulkan-loader molten-vk
+  arch -x86_64 /usr/local/bin/brew install -f --overwrite --quiet python@3.14 opencv@4 "llvm@$LLVM_COMPILER_VER" sdl3 vulkan-headers vulkan-loader
   arch -x86_64 /usr/local/bin/brew unlink  --quiet ffmpeg qtbase qtsvg qtdeclarative protobuf || true
 fi
 
@@ -71,10 +71,6 @@ export SDL3_DIR="$BREW_PATH/opt/sdl3/lib/cmake/SDL3"
 export PATH="/opt/homebrew/opt/llvm@$LLVM_COMPILER_VER/bin:$PATH"
 export LDFLAGS="-L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/c++ -L$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER/lib/unwind -lunwind"
 
-export VULKAN_SDK
-VULKAN_SDK="$BREW_PATH/opt/molten-vk"
-ln -s "$BREW_PATH/opt/vulkan-loader/lib/libvulkan.dylib" "$VULKAN_SDK/lib/libvulkan.dylib"
-
 export LLVM_DIR
 LLVM_DIR="$BREW_PATH/opt/llvm@$LLVM_COMPILER_VER"
 # Pull all the submodules except some
@@ -98,7 +94,7 @@ cmake .. \
     -DUSE_SYSTEM_FFMPEG=OFF \
     -DUSE_NATIVE_INSTRUCTIONS=OFF \
     -DUSE_PRECOMPILED_HEADERS=OFF \
-    -DUSE_SYSTEM_MVK=ON \
+    -DUSE_SYSTEM_MVK=OFF \
     -DUSE_SYSTEM_SDL=ON \
     -DUSE_SYSTEM_OPENCV=ON \
     -G Ninja
@@ -120,7 +116,7 @@ cmake .. \
     -DUSE_SYSTEM_FFMPEG=OFF \
     -DUSE_NATIVE_INSTRUCTIONS=OFF \
     -DUSE_PRECOMPILED_HEADERS=OFF \
-    -DUSE_SYSTEM_MVK=ON \
+    -DUSE_SYSTEM_MVK=OFF \
     -DUSE_SYSTEM_SDL=ON \
     -DUSE_SYSTEM_OPENCV=ON \
     -G Ninja

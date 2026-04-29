@@ -132,10 +132,6 @@ if (NOT ANDROID)
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/Icons $<TARGET_FILE_DIR:rpcs3>/../Resources/Icons
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/GuiConfigs $<TARGET_FILE_DIR:rpcs3>/../Resources/GuiConfigs
             COMMAND "${MACDEPLOYQT_EXECUTABLE}" "${PROJECT_BINARY_DIR}/bin/rpcs3.app" "$<$<CONFIG:Debug,RelWithDebInfo>:-no-strip>")
-        install (CODE "
-            include(BundleUtilities)
-            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app\" \"\" \"\")
-        " OPTIONAL)
     elseif(UNIX)
         add_custom_command(TARGET rpcs3 POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/Icons $<TARGET_FILE_DIR:rpcs3>/Icons
@@ -172,6 +168,13 @@ if (NOT ANDROID)
             DESTINATION ${CMAKE_INSTALL_DATADIR}/rpcs3)
         install(DIRECTORY ../bin/test
             DESTINATION ${CMAKE_INSTALL_DATADIR}/rpcs3)
+    elseif(APPLE)
+        # Install the binary
+        install(TARGETS rpcs3 BUNDLE DESTINATION ${PROJECT_BINARY_DIR}/bin)
+        install (CODE "
+            include(BundleUtilities)
+            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app\" \"\" \"\")
+        " OPTIONAL)
     endif()
 endif()
 

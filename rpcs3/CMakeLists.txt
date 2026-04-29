@@ -134,7 +134,7 @@ if (NOT ANDROID)
             COMMAND "${MACDEPLOYQT_EXECUTABLE}" "${PROJECT_BINARY_DIR}/bin/rpcs3.app" "$<$<CONFIG:Debug,RelWithDebInfo>:-no-strip>")
         install (CODE "
             include(BundleUtilities)
-            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app" \"\" \"\")
+            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app\" \"\" \"\")
         " OPTIONAL)
     elseif(UNIX)
         add_custom_command(TARGET rpcs3 POST_BUILD

@@ -170,11 +170,13 @@ if (NOT ANDROID)
             DESTINATION ${CMAKE_INSTALL_DATADIR}/rpcs3)
     elseif(APPLE)
         # Install the binary
+        file(GLOB_RECURSE extra_libs "${PROJECT_BINARY_DIR}/bin/rpcs3.app/Contents/MacOS/*.dylib")
         install(TARGETS rpcs3 BUNDLE DESTINATION ${PROJECT_BINARY_DIR}/bin)
         install (CODE "
             include(BundleUtilities)
-            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app\" \"\" \"\")
-        " OPTIONAL)
+            set(BU_CHMOD_BUNDLE_ITEMS ON)
+            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app" \"${FIXUP_LIBS}\" \"\")
+        ")
     endif()
 endif()
 

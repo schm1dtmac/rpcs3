@@ -175,7 +175,7 @@ if (NOT ANDROID)
         install (CODE "
             include(BundleUtilities)
             set(BU_CHMOD_BUNDLE_ITEMS ON)
-            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app" \"${FIXUP_LIBS}\" \"\")
+            fixup_bundle(\"${PROJECT_BINARY_DIR}/bin/rpcs3.app\" \"${FIXUP_LIBS}\" \"\")
         ")
     endif()
 endif()

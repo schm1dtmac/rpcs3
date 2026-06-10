@@ -191,14 +191,12 @@ jobs:
         run: .ci/github-upload.sh
 
       - name: Save Build Ccache
-        if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@main
         with:
           path: ${{ env.CCACHE_DIR }}
           key: ${{ steps.restore-build-ccache.outputs.cache-primary-key }}
 
       - name: Save Qt Cache
-        if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@main
         with:
           path: /tmp/Qt

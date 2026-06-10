@@ -1051,6 +1051,7 @@ settings_dialog::settings_dialog(std::shared_ptr<gui_settings> gui_settings, std
 		const QString audio_format_name = m_emu_settings->GetLocalizedSetting(QString(), emu_settings_type::AudioFormats, static_cast<int>(audio_fmt), true);
 		QListWidgetItem* item = new QListWidgetItem(audio_format_name, ui->list_audio_formats);
 		item->setData(Qt::UserRole, static_cast<u32>(audio_fmt));
+		item->setSizeHint(QSize(item->sizeHint().width(), 24));
 		if (audio_fmt == audio_format_flag::lpcm_2_48khz)
 		{
 			item->setFlags(item->flags() & ~Qt::ItemIsEnabled);

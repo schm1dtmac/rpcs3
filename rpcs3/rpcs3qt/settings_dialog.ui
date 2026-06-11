@@ -1097,9 +1097,6 @@
                  <property name="selectionMode">
                   <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
                  </property>
-                 <property name="spacing">
-                  <number>4</number>
-                 </property>
                 </widget>
                </item>
               </layout>

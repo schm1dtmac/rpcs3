@@ -1052,6 +1052,7 @@ settings_dialog::settings_dialog(std::shared_ptr<gui_settings> gui_settings, std
 		QListWidgetItem* item = new QListWidgetItem(audio_format_name, ui->list_audio_formats);
 		item->setData(Qt::UserRole, static_cast<u32>(audio_fmt));
 		item->setSizeHint(QSize(item->sizeHint().width(), 24));
+		item->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 		if (audio_fmt == audio_format_flag::lpcm_2_48khz)
 		{
 			item->setFlags(item->flags() & ~Qt::ItemIsEnabled);

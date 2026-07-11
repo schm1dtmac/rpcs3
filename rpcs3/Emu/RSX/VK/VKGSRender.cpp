@@ -37,7 +37,6 @@ namespace vk
 
 		switch (color_format)
 		{
-#ifndef __APPLE__
 		case rsx::surface_color_format::r5g6b5:
 			return std::make_pair(VK_FORMAT_R5G6B5_UNORM_PACK16, vk::default_component_map);
 
@@ -46,17 +45,7 @@ namespace vk
 
 		case rsx::surface_color_format::x1r5g5b5_z1r5g5b5:
 			return std::make_pair(VK_FORMAT_A1R5G5B5_UNORM_PACK16, z_rgb);
-#else
-		// assign B8G8R8A8_UNORM to formats that are not supported by Metal
-		case rsx::surface_color_format::r5g6b5:
-			return std::make_pair(VK_FORMAT_B8G8R8A8_UNORM, vk::default_component_map);
-
-		case rsx::surface_color_format::x1r5g5b5_o1r5g5b5:
-			return std::make_pair(VK_FORMAT_B8G8R8A8_UNORM, o_rgb);
-
-		case rsx::surface_color_format::x1r5g5b5_z1r5g5b5:
-			return std::make_pair(VK_FORMAT_B8G8R8A8_UNORM, z_rgb);
-#endif
+				
 		case rsx::surface_color_format::a8r8g8b8:
 			return std::make_pair(VK_FORMAT_B8G8R8A8_UNORM, vk::default_component_map);
 
@@ -663,9 +652,7 @@ VKGSRender::VKGSRender(utils::serial* ar) noexcept : GSRender(ar)
 	backend_config.supports_hw_renormalization = vk::is_NVIDIA(vk::get_driver_vendor());
 
 	// Conditional rendering support
-	// Do not use on MVK due to a speedhack we rely on (streaming results without stopping the current renderpass)
-	// If we break the renderpasses, MVK loses around 75% of its performance in troublesome spots compared to just doing a CPU sync
-	backend_config.supports_hw_conditional_render = (vk::get_driver_vendor() != vk::driver_vendor::MVK);
+	backend_config.supports_hw_conditional_render = true;
 
 	// Passthrough DMA
 	backend_config.supports_passthrough_dma = m_device->get_external_memory_host_support();
@@ -721,11 +708,6 @@ VKGSRender::VKGSRender(utils::serial* ar) noexcept : GSRender(ar)
 		}
 		break;
 #endif
-	case vk::driver_vendor::MVK:
-		// Async compute crashes immediately on Apple GPUs
-		rsx_log.error("Apple GPUs are incompatible with the current implementation of asynchronous texture decoding.");
-		backend_config.supports_asynchronous_compute = false;
-		break;
 	case vk::driver_vendor::INTEL:
 		// As expected host allocations won't work on INTEL despite the extension being present
 		if (backend_config.supports_passthrough_dma)

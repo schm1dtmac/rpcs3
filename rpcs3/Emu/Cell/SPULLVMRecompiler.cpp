@@ -210,7 +210,7 @@ class spu_llvm_recompiler : public spu_recompiler_base, public cpu_translator
 	function_info* m_finfo = nullptr;
 
 	// Reduced Loop Pattern information (if available)
-	reduced_loop_t* m_reduced_loop_info = nullptr;
+	std::shared_ptr<reduced_loop_t> m_reduced_loop_info;
 
 	// All blocks in the current function chunk
 	std::unordered_map<u32, block_info, value_hash<u32, 2>> m_blocks;
@@ -2689,7 +2689,7 @@ public:
 				}
 
 				const bool is_reduced_loop = m_inst_attrs[(baddr - start) / 4] == inst_attr::reduced_loop;
-				m_reduced_loop_info = is_reduced_loop ? std::static_pointer_cast<reduced_loop_t>(ensure(m_patterns.at(baddr - start).info_ptr)).get() : nullptr;
+				m_reduced_loop_info = is_reduced_loop ? std::static_pointer_cast<reduced_loop_t>(ensure(m_patterns.at(baddr - start).info_ptr)) : nullptr;
 
 				BasicBlock* block_optimization_phi_parent =  nullptr;
 				const auto block_optimization_inner = is_reduced_loop ? BasicBlock::Create(m_context, fmt::format("b-loop-it-0x%x", m_pos), m_function) : nullptr;
@@ -2980,6 +2980,11 @@ public:
 							// Amend condition
 							condition = m_ir->CreateAnd(cond_verify, condition);
 						}
+					}
+					else
+					{
+						// Check spu_thread::state
+						condition = m_ir->CreateAnd(m_ir->CreateICmpEQ(spu_context_attr(m_ir->CreateLoad(get_type<u32>(), spu_ptr(&spu_thread::state), true)), m_ir->getInt32(0)), condition);
 					}
 
 					m_ir->CreateCondBr(condition, optimization_block, block_optimization_next);
@@ -7808,7 +7813,7 @@ public:
 
 	value_t<f32[4]> clamp_smax(value_t<f32[4]> v, u32 gpr)
 	{
-		if (m_reduced_loop_info && gpr < s_reg_max && m_reduced_loop_info->is_gpr_not_NaN_hint(gpr))
+		if (gpr < s_reg_max && m_reduced_loop_info && m_reduced_loop_info->is_gpr_not_NaN_hint(gpr))
 		{
 			return v;
 		}
@@ -9219,6 +9224,11 @@ public:
 		return byteswap(data);
 	}
 
+	static constexpr u64 make_negative_LS_offset(u32 original)
+	{
+		return original | ~u64{SPU_LS_SIZE - 1};
+	}
+
 	void STQX(spu_opcode_t op)
 	{
 		const auto a = get_vr(op.ra);
@@ -9228,17 +9238,20 @@ public:
 		{
 			if (auto [ok, data] = get_const_vector(pair.first.value, m_pos); ok)
 			{
-				data._u32[3] %= SPU_LS_SIZE;
+				// "sign extend" offset addend
+				// Discourage the use of multiple addresses to refer to the same block of memory (due to memory mirrors use)
+				// Which may confuse LLVM's optimization
+				const u64 addend = (data._u32[3] >= SPU_LS_SIZE) ? make_negative_LS_offset(data._u32[3]) : data._u32[3];
 
 				if (const u32 remainder = data._u32[3] % 0x10; remainder == 0)
 				{
-					value_t<u64> addr = eval(splat<u64>(data._u32[3]) + zext<u64>(extract(pair.second, 3) & 0x3fff0));
+					value_t<u64> addr = eval(splat<u64>(addend) + zext<u64>(extract(pair.second, 3) & 0x3fff0));
 					make_store_ls(addr, get_vr<u8[16]>(op.rt));
 					return;
 				}
 				else
 				{
-					value_t<u64> addr = eval(splat<u64>(data._u32[3] - remainder) + zext<u64>((extract(pair.second, 3) + remainder) & 0x3fff0));
+					value_t<u64> addr = eval(splat<u64>(addend - remainder) + zext<u64>((extract(pair.second, 3) + remainder) & 0x3fff0));
 					make_store_ls(addr, get_vr<u8[16]>(op.rt));
 					return;
 				}
@@ -9258,17 +9271,20 @@ public:
 		{
 			if (auto [ok, data] = get_const_vector(pair.first.value, m_pos); ok)
 			{
-				data._u32[3] %= SPU_LS_SIZE;
+				// "sign extend" offset addend
+				// Discourage the use of multiple addresses to refer to the same block of memory
+				// Which may confuse LLVM's optimization
+				const u64 addend = (data._u32[3] >= SPU_LS_SIZE) ? make_negative_LS_offset(data._u32[3]) : data._u32[3];
 
 				if (const u32 remainder = data._u32[3] % 0x10; remainder == 0)
 				{
-					value_t<u64> addr = eval(splat<u64>(data._u32[3]) + zext<u64>(extract(pair.second, 3) & 0x3fff0));
+					value_t<u64> addr = eval(splat<u64>(addend) + zext<u64>(extract(pair.second, 3) & 0x3fff0));
 					set_vr(op.rt, make_load_ls(addr));
 					return;
 				}
 				else
 				{
-					value_t<u64> addr = eval(splat<u64>(data._u32[3] - remainder) + zext<u64>((extract(pair.second, 3) + remainder) & 0x3fff0));
+					value_t<u64> addr = eval(splat<u64>(addend - remainder) + zext<u64>((extract(pair.second, 3) + remainder) & 0x3fff0));
 					set_vr(op.rt, make_load_ls(addr));
 					return;
 				}
@@ -9327,20 +9343,24 @@ public:
 
 		const auto a = get_vr(op.ra);
 
-		if (auto [ok, x, y] = match_expr(a, match<u32[4]>() + match<u32[4]>()); ok)
+		if (auto [ok, x, y] = match_expr(a, match<u32[4]>() + match<u32[4]>()); ok && false)
 		{
-			if (auto [ok1, data] = get_const_vector(x.value, m_pos + 1); ok1 && data._u32[3] % 16 == 0)
+			for (auto pair : std::initializer_list<std::pair<llvm_match_t<u32[4]>, llvm_match_t<u32[4]>>>{{x, y}, {y, x}})
 			{
-				value_t<u64> addr = eval(zext<u64>(extract(y, 3) & 0x3fff0) + ((get_imm<u64>(op.si10) << 4) + splat<u64>(data._u32[3] & 0x3fff0)));
-				make_store_ls(addr, get_vr<u8[16]>(op.rt));
-				return;
-			}
+				if (auto [ok, data] = get_const_vector(pair.first.value, m_pos); ok)
+				{
+					// "sign extend" offset addend
+					// Discourage the use of multiple addresses to refer to the same block of memory
+					// Which may confuse LLVM's optimization
+					const u64 addend = (data._u32[3] >= SPU_LS_SIZE) ? make_negative_LS_offset(data._u32[3]) : data._u32[3];
 
-			if (auto [ok2, data] = get_const_vector(y.value, m_pos + 2); ok2 && data._u32[3] % 16 == 0)
-			{
-				value_t<u64> addr = eval(zext<u64>(extract(x, 3) & 0x3fff0) + ((get_imm<u64>(op.si10) << 4) + splat<u64>(data._u32[3] & 0x3fff0)));
-				make_store_ls(addr, get_vr<u8[16]>(op.rt));
-				return;
+					if (const u32 remainder = data._u32[3] % 0x10; remainder == 0)
+					{
+						value_t<u64> addr = eval(zext<u64>(extract(pair.second, 3) & 0x3fff0) + ((get_imm<u64>(op.si10) << 4) + splat<u64>(addend)));
+						make_store_ls(addr, get_vr<u8[16]>(op.rt));
+						return;
+					}
+				}
 			}
 		}
 
@@ -9352,20 +9372,22 @@ public:
 	{
 		const auto a = get_vr(op.ra);
 
-		if (auto [ok, x1, y1] = match_expr(a, match<u32[4]>() + match<u32[4]>()); ok)
+		if (auto [ok, x, y] = match_expr(a, match<u32[4]>() + match<u32[4]>()); ok)
 		{
-			if (auto [ok1, data] = get_const_vector(x1.value, m_pos + 1); ok1 && data._u32[3] % 16 == 0)
+			for (auto pair : std::initializer_list<std::pair<llvm_match_t<u32[4]>, llvm_match_t<u32[4]>>>{{x, y}, {y, x}})
 			{
-				value_t<u64> addr = eval(zext<u64>(extract(y1, 3) & 0x3fff0) + ((get_imm<u64>(op.si10) << 4) + splat<u64>(data._u32[3] & 0x3fff0)));
-				set_vr(op.rt, make_load_ls(addr));
-				return;
-			}
+				if (auto [ok, data] = get_const_vector(pair.first.value, m_pos); ok && false)
+				{
+					// "sign extend" offset addend
+					const u64 addend = (data._u32[3] >= SPU_LS_SIZE) ? data._u32[3] | ~u64{SPU_LS_SIZE - 1} : data._u32[3];
 
-			if (auto [ok2, data] = get_const_vector(y1.value, m_pos + 2); ok2 && data._u32[3] % 16 == 0)
-			{
-				value_t<u64> addr = eval(zext<u64>(extract(x1, 3) & 0x3fff0) + ((get_imm<u64>(op.si10) << 4) + splat<u64>(data._u32[3] & 0x3fff0)));
-				set_vr(op.rt, make_load_ls(addr));
-				return;
+					if (const u32 remainder = data._u32[3] % 0x10; remainder == 0)
+					{
+						value_t<u64> addr = eval(zext<u64>(extract(pair.second, 3) & 0x3fff0) + ((get_imm<u64>(op.si10) << 4) + splat<u64>(addend)));
+						set_vr(op.rt, make_load_ls(addr));
+						return;
+					}
+				}
 			}
 		}
 

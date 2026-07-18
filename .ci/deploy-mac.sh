@@ -4,7 +4,7 @@
 cd build || exit 1
 
 cd bin
-git clone --revision=a075e5e417f87675ea3137b7365f3e5a99608d72 https://github.com/KhronosGroup/MoltenVK.git
+git clone --revision=4b715bdcb1f108f2003fffe126c389ad0cca1c90 https://github.com/KhronosGroup/MoltenVK.git
 cd MoltenVK
 ./fetchDependencies --macos
 make macos MVK_USE_METAL_PRIVATE_API=1

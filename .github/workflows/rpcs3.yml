@@ -5,8 +5,6 @@ defaults:
     shell: bash
 on:
   push:
-    branches:
-      - master # Only trigger push event on 'master' branch
   pull_request:
   workflow_dispatch:
 
@@ -162,7 +160,6 @@ jobs:
   Mac_Build:
     # Only run push event on master branch of main repo, but run all PRs
     needs: Clean_Code_Caches
-    if: github.event_name != 'push' || (github.repository == 'RPCS3/rpcs3' && github.ref_name == 'master')
     strategy:
       fail-fast: false
       matrix:
@@ -185,7 +182,7 @@ jobs:
       RELEASE_MESSAGE: ../GitHubReleaseMessage.txt
       UPLOAD_COMMIT_HASH: ${{ matrix.UPLOAD_COMMIT_HASH }}
       UPLOAD_REPO_FULL_NAME: ${{ matrix.UPLOAD_REPO_FULL_NAME }}
-      RUN_UNIT_TESTS: ${{ matrix.name == 'Apple Silicon' && (github.event_name == 'pull_request' && 'ON') || 'OFF' }}
+      RUN_UNIT_TESTS: github.event_name == 'pull_request' && 'ON' || 'OFF'
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
@@ -207,6 +204,14 @@ jobs:
           path: /tmp/Qt
           key: ${{ runner.os }}-qt-${{ matrix.name }}-${{ env.QT_VER }}
           restore-keys: ${{ runner.os }}-qt-${{ matrix.name }}-${{ env.QT_VER }}
+          
+      - name: Restore MacPorts Cache
+        uses: actions/cache/restore@main
+        id: restore-macports-cache
+        with:
+          path: /opt/local/
+          key: ${{ runner.os }}-MacPorts-${{ matrix.name }}-${{github.run_id}}
+          restore-keys: ${{ runner.os }}-MacPorts-${{ matrix.name }}-
 
       - name: Build
         run: .ci/build-mac.sh
@@ -236,18 +241,22 @@ jobs:
         run: .ci/github-upload.sh
 
       - name: Save Build Ccache
-        if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@main
         with:
           path: ${{ env.CCACHE_DIR }}
           key: ${{ steps.restore-build-ccache.outputs.cache-primary-key }}
 
       - name: Save Qt Cache
-        if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@main
         with:
           path: /tmp/Qt
           key: ${{ steps.restore-qt-cache.outputs.cache-primary-key }}
+
+      - name: Save MacPorts Cache
+        uses: actions/cache/save@main
+        with:
+          path: /opt/local
+          key: ${{ steps.restore-macports-cache.outputs.cache-primary-key }}
 
   Windows_Build:
     # Only run push event on master branch of main repo, but run all PRs

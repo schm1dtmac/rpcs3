@@ -80,6 +80,8 @@ ninja; build_status=$?;
 
 cd ..
 
+sudo port -f uninstall dbus # Needed for caching to work
+
 # If it compiled succesfully let's deploy.
 if [ "$build_status" -eq 0 ]; then
     .ci/deploy-mac.sh

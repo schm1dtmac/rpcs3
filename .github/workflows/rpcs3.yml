@@ -194,8 +194,6 @@ jobs:
           
       - name: Setup MacPorts
         uses: melusina-org/setup-macports@v1
-        with:
-            cache: 'disable'
 
       - name: Restore Build Ccache
         uses: actions/cache/restore@main

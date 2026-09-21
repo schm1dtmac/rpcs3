@@ -2430,7 +2430,7 @@ void settings_dialog::ApplyStylesheet(bool reset)
 
 void settings_dialog::open()
 {
-	QDialog::open();
+	QDialog::show();
 
 	ui->tab_widget_settings->setCurrentIndex(m_tab_index);
 

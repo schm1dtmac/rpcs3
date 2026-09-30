@@ -10,7 +10,7 @@ export LVER="${COMM_TAG}-${COMM_COUNT}-${COMM_HASH}"
 echo "AVVER=$AVVER" >> .ci/ci-vars.env
 
 # Clang depends on LLVM_COMPILER_VER so it needs to be installed here.
-sudo port install "clang-$LLVM_COMPILER_VER"
+sudo port install clang-22 llvm-23
 
 export CXX=clang++
 export CC=clang

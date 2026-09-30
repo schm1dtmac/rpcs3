@@ -4571,12 +4571,14 @@ bool spu_thread::process_mfc_cmd()
 			if (i < 24) [[likely]]
 			{
 				i++;
-				busy_wait(300);
+				__asm__ volatile("wfe" : : : "memory");
+				__asm__ volatile("clrex" ::: "memory");
 			}
 			else
 			{
 				state += cpu_flag::wait + cpu_flag::temp;
-				std::this_thread::yield();
+				__asm__ volatile("wfe" : : : "memory");
+				__asm__ volatile("clrex" ::: "memory");
 				static_cast<void>(check_state());
 			}
 		}())

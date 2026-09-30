@@ -10,7 +10,7 @@ export LVER="${COMM_TAG}-${COMM_COUNT}-${COMM_HASH}"
 echo "AVVER=$AVVER" >> .ci/ci-vars.env
 
 # Clang depends on LLVM_COMPILER_VER so it needs to be installed here.
-sudo port install clang-22 llvm-23
+sudo port install llvm-23 clang-22
 
 export CXX=clang++
 export CC=clang
@@ -44,7 +44,7 @@ ditto "/tmp/Qt/$QT_VER" "qt-downloader/$QT_VER"
 export Qt6_DIR="$WORKDIR/qt-downloader/$QT_VER/clang_64/lib/cmake/Qt$QT_VER_MAIN"
 export SDL3_DIR="/opt/local/lib/cmake/SDL3"
 export OpenCV_DIR="/opt/local/libexec/opencv4"
-export PATH="/opt/local/libexec/llvm-$LLVM_COMPILER_VER/bin:/$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"
+export PATH="/opt/local/libexec/llvm-22/bin:/$WORKDIR/qt-downloader/$QT_VER/clang_64/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:$PATH"
 export LDFLAGS="-L/opt/local/lib -Wl,-rpath,/opt/local/lib"
 export VULKAN_SDK="/opt/local"
 export LLVM_DIR="/opt/local/libexec/llvm-$LLVM_COMPILER_VER"

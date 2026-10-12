@@ -10,11 +10,18 @@ export LVER="${COMM_TAG}-${COMM_COUNT}-${COMM_HASH}"
 echo "AVVER=$AVVER" >> .ci/ci-vars.env
 
 # Setup MacPorts
-wget https://github.com/macports/macports-base/releases/download/v2.12.6/MacPorts-2.12.6-15-Sequoia.pkg
-sudo installer -pkg MacPorts-2.12.6-15-Sequoia.pkg -target /
+if [ ! -d "/opt/local" ]; then
+  wget https://github.com/macports/macports-base/releases/download/v2.12.6/MacPorts-2.12.6-15-Sequoia.pkg
+  sudo installer -pkg MacPorts-2.12.6-15-Sequoia.pkg -target /
 # shellcheck disable=SC1090
-. ~/.bash_profile
-sudo port install abseil ccache "clang-$LLVM_COMPILER_VER" gtest opencv4 sdl3 vulkan-headers vulkan-loader MoltenVK
+  . ~/.bash_profile
+  sudo port install abseil ccache "clang-$LLVM_COMPILER_VER" gtest opencv4 sdl3 vulkan-headers vulkan-loader MoltenVK
+else
+  wget https://github.com/macports/macports-base/releases/download/v2.12.6/MacPorts-2.12.6-15-Sequoia.pkg
+  sudo installer -pkg MacPorts-2.12.6-15-Sequoia.pkg -target /
+# shellcheck disable=SC1090
+  . ~/.bash_profile
+fi
 
 export CXX=clang++
 export CC=clang
